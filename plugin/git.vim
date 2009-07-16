@@ -10,6 +10,10 @@ if !exists('g:git_bin')
     let g:git_bin = 'git'
 endif
 
+if !exists('g:svn_bin')
+    let g:svn_bin = 'svn'
+endif
+
 if !exists('g:git_author_highlight')
     let g:git_author_highlight = { }
 endif
@@ -27,6 +31,7 @@ nnoremap <Leader>gA :GitAdd <cfile><Enter>
 nnoremap <Leader>gc :GitCommit<Enter>
 nnoremap <Leader>gp :GitPullRebase<Enter>
 nnoremap <Leader>gb :GitBlame<Enter>
+nnoremap <Leader>sb :GitBlame<Enter>
 
 " Ensure b:git_dir exists.
 function! s:GetGitDir()
@@ -214,6 +219,34 @@ function! GitBlame()
     syncbind
 endfunction
 
+" Show revision and author for each line. (svn)
+function! SvnBlame()
+    let git_output = s:SystemSvn('blame -- ' . expand('%'))
+    if !strlen(git_output)
+        echo "No output from svn command"
+        return
+    endif
+
+    setlocal noscrollbind
+
+    " :/
+    let git_command_edit_save = g:git_command_edit
+    let g:git_command_edit = 'leftabove vnew'
+    call <SID>OpenGitBuffer(git_output)
+    let g:git_command_edit = git_command_edit_save
+
+    setlocal modifiable
+    silent %s/\d\d\d\d\zs \+\d\+).*//
+    vertical resize 20
+    setlocal nomodifiable
+    setlocal nowrap scrollbind
+
+    wincmd p
+    setlocal nowrap scrollbind
+
+    syncbind
+endfunction
+
 " Experimental
 function! s:DoHighlightGitBlame()
     for l in range(1, line('$'))
@@ -258,6 +291,10 @@ endfunction
 
 function! s:SystemGit(args)
     return system(g:git_bin . ' ' . a:args)
+endfunction
+
+function! s:SystemSvn(args)
+    return system(g:svn_bin . ' ' . a:args)
 endfunction
 
 " Show vimdiff for merge. (experimental)
@@ -337,6 +374,7 @@ command! -nargs=* GitLog              call GitLog(<q-args>)
 command! -nargs=* GitCommit           call GitCommit(<q-args>)
 command! -nargs=1 GitCatFile          call GitCatFile(<q-args>)
 command!          GitBlame            call GitBlame()
+command!          SvnBlame            call SvnBlame()
 command! -nargs=+ Git                 call GitDoCommand(<q-args>)
 command!          GitVimDiffMerge     call GitVimDiffMerge()
 command!          GitVimDiffMergeDone call GitVimDiffMergeDone()
