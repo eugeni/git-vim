@@ -236,7 +236,6 @@ function! SvnBlame()
     let g:git_command_edit = git_command_edit_save
 
     setlocal modifiable
-    silent %s/\d\d\d\d\zs \+\d\+).*//
     vertical resize 20
     setlocal nomodifiable
     setlocal nowrap scrollbind
