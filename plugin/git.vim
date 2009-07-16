@@ -31,7 +31,7 @@ nnoremap <Leader>gA :GitAdd <cfile><Enter>
 nnoremap <Leader>gc :GitCommit<Enter>
 nnoremap <Leader>gp :GitPullRebase<Enter>
 nnoremap <Leader>gb :GitBlame<Enter>
-nnoremap <Leader>sb :GitBlame<Enter>
+nnoremap <Leader>sb :SvnBlame<Enter>
 
 " Ensure b:git_dir exists.
 function! s:GetGitDir()
